@@ -1,0 +1,8 @@
+{
+    "cluster":{
+        "owner":"me-at-prod",
+        "address":"https://kubernetes.default.svc",
+        "name":"prod"
+    },
+    "extraData1":"extraData1"
+}

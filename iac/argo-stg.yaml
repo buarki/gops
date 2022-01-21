@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: app-stg
+spec:
+  generators:
+    - matrix:
+        generators:
+          - git:
+              repoURL: https://github.com/quickcoder92/gitops.git
+              revision: HEAD # HEAD of stg branch
+              directories:
+                - path: 'iac/apps/*'
+          - clusters: {}
+          #     selector:
+          #       matchLabels:
+          #         argocd.argoproj.io/secret-type: cluster
+  template:
+    metadata:
+      name: '{{path.basename}}-{{name}}'
+    spec:
+      project: '{{path.basename}}'
+      source:
+        repoURL: https://github.com/quickcoder92/gitops.git
+        targetRevision: HEAD # HEAD of stg branch
+        path: '{{path}}-stg.yaml'
+      destination:
+        server: https://kubernetes.default.svc #'{{server}}'
+        namespace: default #'{{path.basename}}' # '{{stg}}'
