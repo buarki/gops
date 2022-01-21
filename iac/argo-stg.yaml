@@ -1,29 +1,113 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   name: app-stg
+# spec:
+#   generators:
+#     - matrix:
+#         generators:
+#           - git:
+#               repoURL: https://github.com/oreasek/gops.git
+#               revision: HEAD # HEAD of stg branch
+#               directories:
+#                 - path: 'iac/apps/*'
+#           - clusters: {}
+#           #     selector:
+#           #       matchLabels:
+#           #         argocd.argoproj.io/secret-type: cluster
+#   template:
+#     metadata:
+#       name: '{{path.basename}}-{{name}}'
+#     spec:
+#       project: default #'{{path.basename}}'
+#       source:
+#         repoURL: https://github.com/oreasek/gops.git
+#         targetRevision: HEAD # HEAD of stg branch
+#         path: '{{path}}/values-stg.yaml'
+#       destination:
+#         server: https://kubernetes.default.svc #'{{server}}'
+#         namespace: default #'{{path.basename}}' # '{{stg}}'
+
+
+##########################################################################
+
+
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   name: app-stg
+# spec:
+#   generators:
+#   - git:
+#       repoURL: https://github.com/oreasek/gops.git
+#       revision: HEAD
+#       files:
+#       - path: "iac/envs/stg/config.json"
+#   template:
+#     metadata:
+#       name: '{{cluster.name}}-stg'
+#     spec:
+#       project: default
+#       source:
+#         repoURL: https://github.com/oreasek/gops.git
+#         targetRevision: HEAD
+#         path: "iac/apps/**"
+#       destination:
+#         server: '{{cluster.server}}'
+#         namespace: default #guestbook
+
+
+##########################################################3
+
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   name: app-stg
+#   namespace: default
+# spec:
+#   generators:
+#   - git:
+#       repoURL: https://github.com/oreasek/gops.git
+#       revision: main
+#       directories:
+#       - path: iac/apps/*
+#   template:
+#     metadata:
+#       name: '{{path.basename}}'
+#     spec:
+#       project: default
+#       syncPolicy:
+#         automated:
+#           prune: true
+#           selfHeal: true
+#       source:
+#         repoURL: https://github.com/oreasek/gops.git
+#         targetRevision: master
+#         path: '{{path}}'
+#       destination:
+#         server: https://kubernetes.default.svc
+#         namespace: '{{namespace}}'
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: app-stg
+  name: cluster-addons
 spec:
   generators:
-    - matrix:
-        generators:
-          - git:
-              repoURL: https://github.com/oreasek/gops.git
-              revision: HEAD # HEAD of stg branch
-              directories:
-                - path: 'iac/apps/*'
-          - clusters: {}
-          #     selector:
-          #       matchLabels:
-          #         argocd.argoproj.io/secret-type: cluster
+  - git:
+      repoURL: https://github.com/oreasek/gops.git
+      revision: HEAD
+      directories:
+      - path: iac/apps/*
   template:
     metadata:
-      name: '{{path.basename}}-{{name}}'
+      name: '{{path.basename}}'
     spec:
-      project: '{{path.basename}}'
+      project: default
       source:
         repoURL: https://github.com/oreasek/gops.git
-        targetRevision: HEAD # HEAD of stg branch
-        path: '{{path}}-stg.yaml'
+        targetRevision: HEAD
+        path: '{{path}}'
       destination:
-        server: https://kubernetes.default.svc #'{{server}}'
-        namespace: default #'{{path.basename}}' # '{{stg}}'
+        server: https://kubernetes.default.svc
+        namespace: '{{path.basename}}'
+  
